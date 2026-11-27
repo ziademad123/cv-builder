@@ -17,7 +17,8 @@ const UI = {
     remove:"حذف", ok:"تم التفعيل ✔", bad:"الكود غير صحيح",
     previewNote:"معاينة مباشرة — هتطبع بالشكل ده بالظبط",
     footNote:"اتعمل بحب في مصر 🇪🇬 — بياناتك على جهازك بس.",
-    toggle:"English", tplNames:{classic:"كلاسيك", modern:"مودرن", elegant:"أنيق", sidebar:"سايدبار"},
+    toggle:"English", themeLabel:"لون القالب:",
+    tplNames:{classic:"كلاسيك", modern:"مودرن", elegant:"أنيق", sidebar:"سايدبار", minimal:"بسيط", executive:"تنفيذي", creative:"مبتكر", compact:"مضغوط"},
     pageTitle:"اعمل سيرتك | سيرتي"
   },
   en: {
@@ -34,10 +35,12 @@ const UI = {
     remove:"Remove", ok:"Unlocked ✔", bad:"Invalid code",
     previewNote:"Live preview — it prints exactly like this",
     footNote:"Made with love in Egypt 🇪🇬 — your data stays on your device.",
-    toggle:"العربية", tplNames:{classic:"Classic", modern:"Modern", elegant:"Elegant", sidebar:"Sidebar"},
+    toggle:"العربية", themeLabel:"Theme:",
+    tplNames:{classic:"Classic", modern:"Modern", elegant:"Elegant", sidebar:"Sidebar", minimal:"Minimal", executive:"Executive", creative:"Creative", compact:"Compact"},
     pageTitle:"Build your CV | My CV"
   }
 };
+const THEMES = {navy:"#16305e", teal:"#0e7c7b", burgundy:"#7c2d4e", forest:"#2d6a4f", charcoal:"#3a3f4b"};
 const CVL = {
   ar:{exp:"الخبرات", edu:"التعليم", skills:"المهارات", langs:"اللغات", sum:"نبذة"},
   en:{exp:"Experience", edu:"Education", skills:"Skills", langs:"Languages", sum:"Summary"}
@@ -47,12 +50,13 @@ const SAMPLE = {
   summary:"مهندس برمجيات بخبرة 3 سنين في بناء تطبيقات الويب. بحب حل المشاكل والتعلم المستمر.",
   exp:[{a:"مطور ويب", b:"شركة المستقبل", c:"2023 - الآن", d:"بناء وصيانة مواقع وتطبيقات ويب.\nتحسين سرعة الصفحات بنسبة 40%."}],
   edu:[{a:"بكالوريوس هندسة حاسبات", b:"جامعة القاهرة", c:"2018 - 2023", d:""}],
-  skills:"JavaScript, React, SQL, Git", langs:"العربية, English", tpl:"classic", cvlang:"ar", photo:""
+  skills:"JavaScript, React, SQL, Git", langs:"العربية, English", tpl:"modern", cvlang:"ar", photo:"", theme:"navy"
 };
-const BLANK = {name:"", title:"", email:"", phone:"", city:"", summary:"", exp:[{a:"",b:"",c:"",d:""}], edu:[{a:"",b:"",c:"",d:""}], skills:"", langs:"", tpl:"classic", cvlang:"ar", photo:""};
+const BLANK = {name:"", title:"", email:"", phone:"", city:"", summary:"", exp:[{a:"",b:"",c:"",d:""}], edu:[{a:"",b:"",c:"",d:""}], skills:"", langs:"", tpl:"classic", cvlang:"ar", photo:"", theme:"navy"};
 
 let S = JSON.parse(localStorage.getItem("cv") || "null") || JSON.parse(JSON.stringify(SAMPLE));
 if (!UI.ar.tplNames[S.tpl]) S.tpl = "classic";
+if (!THEMES[S.theme]) S.theme = "navy";
 const qsTpl = new URLSearchParams(location.search).get("tpl");
 if (qsTpl && UI.ar.tplNames[qsTpl]) S.tpl = qsTpl;
 let ui = new URLSearchParams(location.search).get("ui") || localStorage.getItem("ui") || "ar";
@@ -81,6 +85,21 @@ function renderPills(){
     b.textContent = UI[ui].tplNames[t];
     b.className = t === S.tpl ? "on" : "";
     b.onclick = () => { S.tpl = t; renderPills(); render(); };
+    el.appendChild(b);
+  });
+  renderThemes();
+}
+
+function renderThemes(){
+  const el = $("themeRow"); if (!el) return;
+  el.innerHTML = `<span class="tlabel">${UI[ui].themeLabel}</span>`;
+  Object.keys(THEMES).forEach(k => {
+    const b = document.createElement("button");
+    b.style.background = THEMES[k];
+    b.title = k;
+    b.setAttribute("aria-label", k);
+    b.className = k === S.theme ? "on" : "";
+    b.onclick = () => { S.theme = k; renderThemes(); render(); };
     el.appendChild(b);
   });
 }
@@ -121,11 +140,16 @@ function render(){
   const sEdu = entries(S.edu) ? `<h3>${L.edu}</h3>${entries(S.edu)}` : "";
   const sSk = tags(S.skills) ? `<h3>${L.skills}</h3><div class="tags">${tags(S.skills)}</div>` : "";
   const sLa = tags(S.langs) ? `<h3>${L.langs}</h3><div class="tags">${tags(S.langs)}</div>` : "";
+  const headrow = `<div class="headrow">${photo}<div class="htxt">${head}</div></div>`;
+  const band = `<div class="head">${photo}<div class="htxt">${head}</div></div><div class="body">${sSum}${sExp}${sEdu}${sSk}${sLa}</div>`;
+  const side = `<div class="side">${photo}<h1>${esc(S.name)}</h1><div class="ttl">${esc(S.title)}</div><div class="contact">${contact}</div>${sSk}${sLa}</div><div class="main">${sSum}${sExp}${sEdu}</div>`;
   let inner;
-  if (S.tpl === "modern") inner = `<div class="head">${photo}<div class="htxt">${head}</div></div><div class="body">${sSum}${sExp}${sEdu}${sSk}${sLa}</div>`;
+  if (S.tpl === "modern" || S.tpl === "creative") inner = band;
   else if (S.tpl === "elegant") inner = photo + head + sSum + sExp + sEdu + sSk + sLa;
-  else if (S.tpl === "sidebar") inner = `<div class="side">${photo}<h1>${esc(S.name)}</h1><div class="ttl">${esc(S.title)}</div><div class="contact">${contact}</div>${sSk}${sLa}</div><div class="main">${sSum}${sExp}${sEdu}</div>`;
+  else if (S.tpl === "sidebar" || S.tpl === "executive") inner = side;
+  else if (S.tpl === "minimal" || S.tpl === "compact") inner = headrow + sSum + sExp + sEdu + sSk + sLa;
   else inner = head + sSum + sExp + sEdu + sSk + sLa;
+  cv.style.setProperty("--cv-acc", THEMES[S.theme] || THEMES.navy);
   const wm = pro ? "" : `<div class="wm">${S.cvlang === "ar" ? "سيرتي<br>نسخة مجانية" : "My CV<br>Free version"}</div>`;
   cv.innerHTML = inner + wm;
   cv.classList.add("flick");
