@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>اعمل سيرتك | سيرتي</title>
+<meta name="description" content="املا بياناتك وشوف سيرتك الذاتية بتتبني قدامك لحظة بلحظة، وحملها PDF.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="container">
+    <a class="brand" href="index.html" data-t="brand">سيرتي</a>
+    <div class="nav-links">
+      <a href="index.html" data-t="navHome">الرئيسية</a>
+      <a href="index.html#templates" data-t="navTemplates">القوالب</a>
+      <a href="contact.html" data-t="navContact">اتصل بينا</a>
+      <button class="lang-btn" id="uiToggle">English</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div class="builder-top">
+    <h1 data-t="h1">اعمل سيرتك الذاتية</h1>
+    <div class="spacer">
+      <select id="cvlang" aria-label="cv language">
+        <option value="ar" data-t="cvAr">السيرة: بالعربي</option>
+        <option value="en" data-t="cvEn">السيرة: بالإنجليزي</option>
+      </select>
+      <button id="print" class="btn btn-primary" data-t="download">تحميل PDF</button>
+    </div>
+  </div>
+  <div class="tpl-pills" id="tplPills"></div>
+
+  <div class="layout">
+    <section class="form">
+      <p class="hint" data-t="hint">املا البيانات والمعاينة بتتحدث على طول. بياناتك محفوظة على جهازك بس.</p>
+      <div class="grid">
+        <label><span data-t="name">الاسم الكامل</span><input id="name"></label>
+        <label><span data-t="title">المسمى الوظيفي</span><input id="title"></label>
+        <label><span data-t="email">البريد الإلكتروني</span><input id="email" type="email" dir="ltr"></label>
+        <label><span data-t="phone">الموبايل</span><input id="phone" dir="ltr"></label>
+        <label class="full"><span data-t="city">المدينة</span><input id="city"></label>
+      </div>
+      <label><span data-t="summary">نبذة عنك</span><textarea id="summary" rows="3"></textarea></label>
+      <h2 data-t="exp">الخبرات</h2><div id="expList"></div>
+      <button class="add-btn" id="addExp" data-t="addExp">+ أضف خبرة</button>
+      <h2 data-t="edu">التعليم</h2><div id="eduList"></div>
+      <button class="add-btn" id="addEdu" data-t="addEdu">+ أضف مؤهل</button>
+      <h2 data-t="skillsT">المهارات واللغات</h2>
+      <label><span data-t="skills">المهارات (افصل بينها بفاصلة)</span><input id="skills"></label>
+      <label><span data-t="langs">اللغات (افصل بينها بفاصلة)</span><input id="langs"></label>
+      <div class="pro">
+        <b data-t="proTitle">تحميل بدون علامة مائية</b>
+        <div class="row"><input id="code" placeholder="Code" dir="ltr"><button id="unlock" class="btn btn-ghost" data-t="unlock">فعّل</button></div>
+        <a id="buy" target="_blank" rel="noopener" data-t="buy">اطلب كود</a>
+        <small id="proMsg"></small>
+      </div>
+      <div class="uilang">
+        <button class="btn btn-ghost" id="reset" data-t="reset">مسح البيانات</button>
+        <a class="btn btn-ghost" href="index.html" data-t="backHome">رجوع للرئيسية</a>
+      </div>
+    </section>
+    <section class="preview-wrap">
+      <div class="preview-bar"><span data-t="previewNote">معاينة مباشرة — هتطبع بالشكل ده بالظبط</span></div>
+      <div id="cv" class="cv classic"></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <a class="brand" href="index.html" data-t="brand">سيرتي</a>
+    <small data-t="footNote">اتعمل بحب في مصر 🇪🇬 — بياناتك على جهازك بس.</small>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script src="builder.js"></script>
+</body>
+</html>

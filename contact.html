@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>اتصل بينا | سيرتي</title>
+<meta name="description" content="عندك سؤال أو مشكلة أو طلب كود؟ كلمنا على واتساب أو من الفورم وهنرد عليك بسرعة.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="container">
+    <a class="brand" href="index.html" data-t="brand">سيرتي</a>
+    <div class="nav-links">
+      <a href="index.html" data-t="navHome">الرئيسية</a>
+      <a href="index.html#templates" data-t="navTemplates">القوالب</a>
+      <a href="builder.html" data-t="navBuilder">اعمل سيرتك</a>
+      <button class="lang-btn" id="uiToggle">English</button>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    <div class="sec-head reveal in">
+      <h2 data-t="cTitle">اتصل بينا</h2>
+      <p data-t="cSub">عندك سؤال، مشكلة، أو عايز كود فك العلامة المائية؟ ابعتلنا وهنرد عليك بسرعة.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <h2 data-t="formTitle">ابعتلنا رسالة</h2>
+        <form id="cform">
+          <label><span data-t="fName">اسمك</span><input id="cname" required></label>
+          <label><span data-t="fMsg">رسالتك</span><textarea id="cmsg" rows="5" required></textarea></label>
+          <button class="btn btn-primary" type="submit" data-t="fSend">ابعت على واتساب</button>
+          <p class="hint" data-t="fNote">الرسالة هتتفتح في واتساب عندك جاهزة للإرسال.</p>
+        </form>
+      </div>
+      <div class="contact-card">
+        <h2 data-t="infoTitle">طرق التواصل</h2>
+        <div class="contact-info">
+          <div><span class="ico">💬</span><a id="waLink" target="_blank" rel="noopener" data-t="waText">كلمنا واتساب</a></div>
+          <div id="emailRow" style="display:none"><span class="ico">✉️</span><a id="mailLink" href="#"></a></div>
+          <div><span class="ico">⚡</span><span data-t="fastReply">بنرد عادة في نفس اليوم</span></div>
+          <div><span class="ico">🔓</span><span data-t="codeNote">عشان تشتري كود فك العلامة المائية، دوس "اطلب كود" جوه صفحة بناء السيرة.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <a class="brand" href="index.html" data-t="brand">سيرتي</a>
+    <small data-t="footNote">اتعمل بحب في مصر 🇪🇬 — بياناتك على جهازك بس.</small>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script>
+const C = window.CV_CONFIG || {};
+const UI = {
+  ar: {
+    brand:"سيرتي", navHome:"الرئيسية", navTemplates:"القوالب", navBuilder:"اعمل سيرتك",
+    cTitle:"اتصل بينا", cSub:"عندك سؤال، مشكلة، أو عايز كود فك العلامة المائية؟ ابعتلنا وهنرد عليك بسرعة.",
+    formTitle:"ابعتلنا رسالة", fName:"اسمك", fMsg:"رسالتك", fSend:"ابعت على واتساب",
+    fNote:"الرسالة هتتفتح في واتساب عندك جاهزة للإرسال.",
+    infoTitle:"طرق التواصل", waText:"كلمنا واتساب", fastReply:"بنرد عادة في نفس اليوم",
+    codeNote:"عشان تشتري كود فك العلامة المائية، دوس \"اطلب كود\" جوه صفحة بناء السيرة.",
+    footNote:"اتعمل بحب في مصر 🇪🇬 — بياناتك على جهازك بس.",
+    toggle:"English", title:"اتصل بينا | سيرتي"
+  },
+  en: {
+    brand:"My CV", navHome:"Home", navTemplates:"Templates", navBuilder:"Build your CV",
+    cTitle:"Contact us", cSub:"Have a question, a problem, or want an unlock code? Message us and we will reply fast.",
+    formTitle:"Send us a message", fName:"Your name", fMsg:"Your message", fSend:"Send via WhatsApp",
+    fNote:"The message opens in your WhatsApp, ready to send.",
+    infoTitle:"Ways to reach us", waText:"Chat on WhatsApp", fastReply:"We usually reply the same day",
+    codeNote:"To buy a watermark-unlock code, tap \"Get a code\" inside the CV builder page.",
+    footNote:"Made with love in Egypt 🇪🇬 — your data stays on your device.",
+    toggle:"العربية", title:"Contact us | My CV"
+  }
+};
+let ui = new URLSearchParams(location.search).get("ui") || localStorage.getItem("ui") || "ar";
+if (ui !== "en") ui = "ar";
+function applyUI(){
+  document.documentElement.lang = ui;
+  document.documentElement.dir = ui === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-t]").forEach(e => { e.textContent = UI[ui][e.dataset.t] || e.textContent; });
+  document.getElementById("uiToggle").textContent = UI[ui].toggle;
+  document.title = UI[ui].title;
+}
+document.getElementById("uiToggle").onclick = () => { ui = ui === "ar" ? "en" : "ar"; localStorage.setItem("ui", ui); applyUI(); };
+document.getElementById("waLink").href = C.contactWhatsApp || C.buyLink || "#";
+if (C.contactEmail) {
+  const r = document.getElementById("emailRow"); r.style.display = "";
+  const m = document.getElementById("mailLink"); m.href = "mailto:" + C.contactEmail; m.textContent = C.contactEmail;
+}
+document.getElementById("cform").onsubmit = e => {
+  e.preventDefault();
+  const n = document.getElementById("cname").value.trim();
+  const m = document.getElementById("cmsg").value.trim();
+  const base = (C.contactWhatsApp || C.buyLink || "").split("?")[0];
+  const text = encodeURIComponent((ui === "ar" ? "أنا " : "I'm ") + n + ":\n" + m);
+  window.open(base + "?text=" + text, "_blank", "noopener");
+};
+applyUI();
+</script>
+</body>
+</html>
