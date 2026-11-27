@@ -45,16 +45,28 @@ const CVL = {
   ar:{exp:"الخبرات", edu:"التعليم", skills:"المهارات", langs:"اللغات", sum:"نبذة"},
   en:{exp:"Experience", edu:"Education", skills:"Skills", langs:"Languages", sum:"Summary"}
 };
-const SAMPLE = {
-  name:"أحمد محمد", title:"مهندس برمجيات", email:"ahmed@example.com", phone:"+20 100 000 0000", city:"القاهرة، مصر",
-  summary:"مهندس برمجيات بخبرة 3 سنين في بناء تطبيقات الويب. بحب حل المشاكل والتعلم المستمر.",
-  exp:[{a:"مطور ويب", b:"شركة المستقبل", c:"2023 - الآن", d:"بناء وصيانة مواقع وتطبيقات ويب.\nتحسين سرعة الصفحات بنسبة 40%."}],
-  edu:[{a:"بكالوريوس هندسة حاسبات", b:"جامعة القاهرة", c:"2018 - 2023", d:""}],
-  skills:"JavaScript, React, SQL, Git", langs:"العربية, English", tpl:"modern", cvlang:"ar", photo:"", theme:"navy"
+/* نصوص إرشادية (placeholders) بتظهر باهتة ومش بتتطبع أبدًا */
+const PH = {
+  ar: {
+    name:"محمد خالد", title:"مهندس برمجيات", email:"mohamed@example.com", phone:"+20 100 000 0000", city:"القاهرة، مصر",
+    summary:"مثلًا: مهندس برمجيات بخبرة 3 سنين في بناء تطبيقات الويب. بحب حل المشاكل والتعلم المستمر.",
+    role:"مطور ويب", company:"شركة المستقبل", period:"2023 - الآن", desc:"أهم إنجازاتك ومسؤولياتك في الدور ده...",
+    degree:"بكالوريوس هندسة حاسبات", school:"جامعة القاهرة",
+    skills:"JavaScript, React, SQL", langs:"العربية, English",
+    skillsInput:"مثل: JavaScript, Excel, Photoshop", langsInput:"مثل: العربية، English"
+  },
+  en: {
+    name:"Mohamed Khaled", title:"Software Engineer", email:"mohamed@example.com", phone:"+20 100 000 0000", city:"Cairo, Egypt",
+    summary:"E.g.: Software engineer with 3 years of experience building web apps...",
+    role:"Web Developer", company:"Future Corp", period:"2023 - Present", desc:"Your key achievements and responsibilities...",
+    degree:"B.Sc. Computer Engineering", school:"Cairo University",
+    skills:"JavaScript, React, SQL", langs:"Arabic, English",
+    skillsInput:"E.g.: JavaScript, Excel, Photoshop", langsInput:"E.g.: Arabic, English"
+  }
 };
 const BLANK = {name:"", title:"", email:"", phone:"", city:"", summary:"", exp:[{a:"",b:"",c:"",d:""}], edu:[{a:"",b:"",c:"",d:""}], skills:"", langs:"", tpl:"classic", cvlang:"ar", photo:"", theme:"navy"};
 
-let S = JSON.parse(localStorage.getItem("cv") || "null") || JSON.parse(JSON.stringify(SAMPLE));
+let S = JSON.parse(localStorage.getItem("cv") || "null") || JSON.parse(JSON.stringify(BLANK));
 if (!UI.ar.tplNames[S.tpl]) S.tpl = "classic";
 if (!THEMES[S.theme]) S.theme = "navy";
 const qsTpl = new URLSearchParams(location.search).get("tpl");
@@ -69,11 +81,12 @@ function items(key, list, labels){
   const el = $(list); el.innerHTML = "";
   S[key].forEach((it, i) => {
     const d = document.createElement("div"); d.className = "item";
-    d.innerHTML = ["a","b","c","d"].map((f, j) =>
-      `<label><span>${UI[ui][labels[j]]}</span>${f === "d"
-        ? `<textarea rows="2" data-k="${key}" data-i="${i}" data-f="${f}">${esc(it[f])}</textarea>`
-        : `<input data-k="${key}" data-i="${i}" data-f="${f}" value="${esc(it[f])}">`}</label>`
-    ).join("") + `<button class="rm" data-rm="${key}" data-i="${i}">${UI[ui].remove}</button>`;
+    d.innerHTML = ["a","b","c","d"].map((f, j) => {
+      const phr = PH[ui][labels[j]] || "";
+      return `<label><span>${UI[ui][labels[j]]}</span>${f === "d"
+        ? `<textarea rows="2" data-k="${key}" data-i="${i}" data-f="${f}" placeholder="${esc(phr)}">${esc(it[f])}</textarea>`
+        : `<input data-k="${key}" data-i="${i}" data-f="${f}" value="${esc(it[f])}" placeholder="${esc(phr)}">`}</label>`;
+    }).join("") + `<button class="rm" data-rm="${key}" data-i="${i}">${UI[ui].remove}</button>`;
     el.appendChild(d);
   });
 }
@@ -105,7 +118,10 @@ function renderThemes(){
 }
 
 function renderForm(){
-  ["name","title","email","phone","city","summary","skills","langs"].forEach(k => $(k).value = S[k] || "");
+  ["name","title","email","phone","city","summary","skills","langs"].forEach(k => {
+    $(k).value = S[k] || "";
+    $(k).placeholder = k === "skills" ? PH[ui].skillsInput : k === "langs" ? PH[ui].langsInput : (PH[ui][k] || "");
+  });
   $("cvlang").value = S.cvlang;
   $("rmPhoto").style.display = S.photo ? "" : "none";
   items("exp", "expList", ["role","company","period","desc"]);
@@ -123,26 +139,35 @@ function applyUI(){
 }
 
 const tags = s => String(s||"").split(/[,،]/).map(x=>x.trim()).filter(Boolean).map(x=>`<span>${esc(x)}</span>`).join("");
-const entries = a => a.filter(e=>e.a||e.b).map(e=>`<div class="entry"><b>${esc(e.a)}</b>${e.b?" , "+esc(e.b):""}<div class="meta">${esc(e.c)}</div><p>${esc(e.d)}</p></div>`).join("");
+/* باهت للنصوص الإرشادية، وبيختفي في الطباعة */
+const ph = txt => `<span class="phold">${esc(txt)}</span>`;
 
 function render(){
   const L = CVL[S.cvlang], cv = $("cv");
   cv.className = "cv " + S.tpl;
   cv.dir = S.cvlang === "ar" ? "rtl" : "ltr";
   cv.lang = S.cvlang;
-  const contact = [S.email, S.phone, S.city].filter(Boolean).map(x=>`<span>${esc(x)}</span>`).join("");
-  const w = (S.name || "").trim().split(/\s+/);
+  const P = PH[S.cvlang] || PH.ar;
+  const v = (val, key) => val ? esc(val) : ph(P[key] || "");
+  const contact = ["email","phone","city"].map(k => `<span>${v(S[k], k)}</span>`).join("");
+  const w = (S.name || P.name).trim().split(/\s+/);
   const ini = (((w[0] || "?")[0]) + ((w[1] || "")[0] || "")).toUpperCase();
   const photo = S.photo ? `<img class="ph" src="${S.photo}" alt="">` : `<span class="ph ini">${esc(ini)}</span>`;
-  const head = `<h1>${esc(S.name)}</h1><div class="ttl">${esc(S.title)}</div><div class="contact">${contact}</div>`;
-  const sSum = S.summary ? `<h3>${L.sum}</h3><p>${esc(S.summary)}</p>` : "";
-  const sExp = entries(S.exp) ? `<h3>${L.exp}</h3>${entries(S.exp)}` : "";
-  const sEdu = entries(S.edu) ? `<h3>${L.edu}</h3>${entries(S.edu)}` : "";
-  const sSk = tags(S.skills) ? `<h3>${L.skills}</h3><div class="tags">${tags(S.skills)}</div>` : "";
-  const sLa = tags(S.langs) ? `<h3>${L.langs}</h3><div class="tags">${tags(S.langs)}</div>` : "";
+  const head = `<h1>${v(S.name, "name")}</h1><div class="ttl">${v(S.title, "title")}</div><div class="contact">${contact}</div>`;
+  const ent = (a, k1, k2) => a.map(e => {
+    const g = (f, pk) => e[f] ? esc(e[f]) : ph(P[pk]);
+    const sep = (e.a && e.b) ? ' , ' : '<span class="phold"> , </span>';
+    return `<div class="entry"><b>${g("a", k1)}</b>${sep}${g("b", k2)}<div class="meta">${g("c", "period")}</div><p>${g("d", "desc")}</p></div>`;
+  }).join("");
+  const tagsP = (val, key) => tags(val) || String(P[key]).split(/[,،]/).map(x => x.trim()).filter(Boolean).map(x => `<span class="phold">${esc(x)}</span>`).join("");
+  const sSum = `<h3>${L.sum}</h3><p>${v(S.summary, "summary")}</p>`;
+  const sExp = S.exp.length ? `<h3>${L.exp}</h3>${ent(S.exp, "role", "company")}` : "";
+  const sEdu = S.edu.length ? `<h3>${L.edu}</h3>${ent(S.edu, "degree", "school")}` : "";
+  const sSk = `<h3>${L.skills}</h3><div class="tags">${tagsP(S.skills, "skills")}</div>`;
+  const sLa = `<h3>${L.langs}</h3><div class="tags">${tagsP(S.langs, "langs")}</div>`;
   const headrow = `<div class="headrow">${photo}<div class="htxt">${head}</div></div>`;
   const band = `<div class="head">${photo}<div class="htxt">${head}</div></div><div class="body">${sSum}${sExp}${sEdu}${sSk}${sLa}</div>`;
-  const side = `<div class="side">${photo}<h1>${esc(S.name)}</h1><div class="ttl">${esc(S.title)}</div><div class="contact">${contact}</div>${sSk}${sLa}</div><div class="main">${sSum}${sExp}${sEdu}</div>`;
+  const side = `<div class="side">${photo}<h1>${v(S.name, "name")}</h1><div class="ttl">${v(S.title, "title")}</div><div class="contact">${contact}</div>${sSk}${sLa}</div><div class="main">${sSum}${sExp}${sEdu}</div>`;
   let inner;
   if (S.tpl === "modern" || S.tpl === "creative") inner = band;
   else if (S.tpl === "elegant") inner = photo + head + sSum + sExp + sEdu + sSk + sLa;

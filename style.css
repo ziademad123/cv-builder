@@ -162,6 +162,7 @@ label span{display:block;margin-bottom:4px;color:var(--muted);font-weight:500}
 .tags span{background:color-mix(in srgb,var(--cv-acc) 10%,#fff);border-radius:12px;padding:3px 10px;font-size:13px}
 .cv .htxt{flex:1;min-width:0}
 .cv p,.cv .ttl,.cv h1,.cv .meta,.cv .entry,.cv .contact span{unicode-bidi:plaintext}
+.cv .phold{color:#b8c1cf;font-style:italic;font-weight:400}
 .wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;font-size:60px;font-weight:800;color:#16305e14;transform:rotate(-30deg);text-align:center;line-height:1.4;z-index:5}
 
 /* photo */
@@ -218,7 +219,7 @@ label span{display:block;margin-bottom:4px;color:var(--muted);font-weight:500}
 }
 @media print{
   body{background:#fff}
-  .nav,.form,.builder-top,.tpl-pills,.preview-bar,footer,.no-print{display:none!important}
+  .nav,.form,.builder-top,.tpl-pills,.theme-row,.preview-bar,footer,.no-print,.cv .phold{display:none!important}
   .layout{display:block;padding:0}
   .preview-wrap{position:static;overflow:visible}
   .preview-stage{height:auto!important;width:auto!important}
