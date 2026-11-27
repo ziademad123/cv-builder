@@ -11,6 +11,7 @@ const UI = {
     summary:"نبذة عنك", exp:"الخبرات", addExp:"+ أضف خبرة", edu:"التعليم", addEdu:"+ أضف مؤهل",
     skillsT:"المهارات واللغات", skills:"المهارات (افصل بينها بفاصلة)", langs:"اللغات (افصل بينها بفاصلة)",
     proTitle:"تحميل بدون علامة مائية", unlock:"فعّل", buy:"اطلب كود", reset:"مسح البيانات", backHome:"رجوع للرئيسية",
+    photo:"الصورة الشخصية (اختياري — بتفضل على جهازك بس)", rmPhoto:"حذف الصورة",
     role:"الوظيفة", company:"الشركة", period:"الفترة", desc:"الوصف", degree:"المؤهل", school:"الجامعة / المدرسة",
     remove:"حذف", ok:"تم التفعيل ✔", bad:"الكود غير صحيح",
     previewNote:"معاينة مباشرة — هتطبع بالشكل ده بالظبط",
@@ -26,6 +27,7 @@ const UI = {
     summary:"Summary", exp:"Experience", addExp:"+ Add experience", edu:"Education", addEdu:"+ Add education",
     skillsT:"Skills & languages", skills:"Skills (comma separated)", langs:"Languages (comma separated)",
     proTitle:"Download without watermark", unlock:"Unlock", buy:"Get a code", reset:"Clear data", backHome:"Back to home",
+    photo:"Your photo (optional — stays on your device)", rmPhoto:"Remove photo",
     role:"Role", company:"Company", period:"Period", desc:"Description", degree:"Degree", school:"School / University",
     remove:"Remove", ok:"Unlocked ✔", bad:"Invalid code",
     previewNote:"Live preview — it prints exactly like this",
@@ -43,9 +45,9 @@ const SAMPLE = {
   summary:"مهندس برمجيات بخبرة 3 سنين في بناء تطبيقات الويب. بحب حل المشاكل والتعلم المستمر.",
   exp:[{a:"مطور ويب", b:"شركة المستقبل", c:"2023 - الآن", d:"بناء وصيانة مواقع وتطبيقات ويب.\nتحسين سرعة الصفحات بنسبة 40%."}],
   edu:[{a:"بكالوريوس هندسة حاسبات", b:"جامعة القاهرة", c:"2018 - 2023", d:""}],
-  skills:"JavaScript, React, SQL, Git", langs:"العربية, English", tpl:"classic", cvlang:"ar"
+  skills:"JavaScript, React, SQL, Git", langs:"العربية, English", tpl:"classic", cvlang:"ar", photo:""
 };
-const BLANK = {name:"", title:"", email:"", phone:"", city:"", summary:"", exp:[{a:"",b:"",c:"",d:""}], edu:[{a:"",b:"",c:"",d:""}], skills:"", langs:"", tpl:"classic", cvlang:"ar"};
+const BLANK = {name:"", title:"", email:"", phone:"", city:"", summary:"", exp:[{a:"",b:"",c:"",d:""}], edu:[{a:"",b:"",c:"",d:""}], skills:"", langs:"", tpl:"classic", cvlang:"ar", photo:""};
 
 let S = JSON.parse(localStorage.getItem("cv") || "null") || JSON.parse(JSON.stringify(SAMPLE));
 if (!UI.ar.tplNames[S.tpl]) S.tpl = "classic";
@@ -84,6 +86,7 @@ function renderPills(){
 function renderForm(){
   ["name","title","email","phone","city","summary","skills","langs"].forEach(k => $(k).value = S[k] || "");
   $("cvlang").value = S.cvlang;
+  $("rmPhoto").style.display = S.photo ? "" : "none";
   items("exp", "expList", ["role","company","period","desc"]);
   items("edu", "eduList", ["degree","school","period","desc"]);
 }
@@ -107,6 +110,9 @@ function render(){
   cv.dir = S.cvlang === "ar" ? "rtl" : "ltr";
   cv.lang = S.cvlang;
   const contact = [S.email, S.phone, S.city].filter(Boolean).map(x=>`<span>${esc(x)}</span>`).join("");
+  const w = (S.name || "").trim().split(/\s+/);
+  const ini = (((w[0] || "?")[0]) + ((w[1] || "")[0] || "")).toUpperCase();
+  const photo = S.photo ? `<img class="ph" src="${S.photo}" alt="">` : `<span class="ph ini">${esc(ini)}</span>`;
   const head = `<h1>${esc(S.name)}</h1><div class="ttl">${esc(S.title)}</div><div class="contact">${contact}</div>`;
   const sSum = S.summary ? `<h3>${L.sum}</h3><p>${esc(S.summary)}</p>` : "";
   const sExp = entries(S.exp) ? `<h3>${L.exp}</h3>${entries(S.exp)}` : "";
@@ -114,8 +120,9 @@ function render(){
   const sSk = tags(S.skills) ? `<h3>${L.skills}</h3><div class="tags">${tags(S.skills)}</div>` : "";
   const sLa = tags(S.langs) ? `<h3>${L.langs}</h3><div class="tags">${tags(S.langs)}</div>` : "";
   let inner;
-  if (S.tpl === "modern") inner = `<div class="head">${head}</div><div class="body">${sSum}${sExp}${sEdu}${sSk}${sLa}</div>`;
-  else if (S.tpl === "sidebar") inner = `<div class="side"><h1>${esc(S.name)}</h1><div class="ttl">${esc(S.title)}</div><div class="contact">${contact}</div>${sSk}${sLa}</div><div class="main">${sSum}${sExp}${sEdu}</div>`;
+  if (S.tpl === "modern") inner = `<div class="head">${photo}<div class="htxt">${head}</div></div><div class="body">${sSum}${sExp}${sEdu}${sSk}${sLa}</div>`;
+  else if (S.tpl === "elegant") inner = photo + head + sSum + sExp + sEdu + sSk + sLa;
+  else if (S.tpl === "sidebar") inner = `<div class="side">${photo}<h1>${esc(S.name)}</h1><div class="ttl">${esc(S.title)}</div><div class="contact">${contact}</div>${sSk}${sLa}</div><div class="main">${sSum}${sExp}${sEdu}</div>`;
   else inner = head + sSum + sExp + sEdu + sSk + sLa;
   const wm = pro ? "" : `<div class="wm">${S.cvlang === "ar" ? "سيرتي<br>نسخة مجانية" : "My CV<br>Free version"}</div>`;
   cv.innerHTML = inner + wm;
@@ -123,15 +130,49 @@ function render(){
   clearTimeout(render._t);
   render._t = setTimeout(() => cv.classList.remove("flick"), 180);
   localStorage.setItem("cv", JSON.stringify(S));
+  fitPreview();
 }
+
+/* تصغير المعاينة عشان تملى العرض المتاح من غير ما يتقصّ منها حاجة */
+function fitPreview(){
+  const stage = $("stage"), cv = $("cv"), wrap = document.querySelector(".preview-wrap");
+  if (!stage || !cv || !wrap) return;
+  const scale = Math.min(1, wrap.clientWidth / 794);
+  cv.style.transform = scale < 1 ? `scale(${scale})` : "";
+  stage.style.width = (794 * scale) + "px";
+  stage.style.height = (cv.offsetHeight * scale) + "px";
+}
+window.addEventListener("resize", fitPreview);
 
 document.addEventListener("input", e => {
   const t = e.target;
+  if (t.type === "file") return;
   if (t.dataset.k) S[t.dataset.k][t.dataset.i][t.dataset.f] = t.value;
   else if (t.id && (t.id in S)) S[t.id] = t.value;
   else return;
   render();
 });
+
+/* الصورة: بتتقرأ وتتصغّر على الجهاز بس، ومتترفعش في أي حتة */
+$("photo").addEventListener("change", e => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const M = 360, sc = Math.min(1, M / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      S.photo = c.toDataURL("image/jpeg", .85);
+      renderForm(); render();
+    };
+    img.src = rd.result;
+  };
+  rd.readAsDataURL(f);
+});
+$("rmPhoto").onclick = () => { S.photo = ""; $("photo").value = ""; renderForm(); render(); };
 $("cvlang").onchange = e => { S.cvlang = e.target.value; render(); };
 document.addEventListener("click", e => {
   const r = e.target.dataset && e.target.dataset.rm;

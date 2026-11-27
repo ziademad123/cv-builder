@@ -24,6 +24,8 @@ const UI = {
     footNote:"اتعمل بحب في مصر 🇪🇬 — بياناتك على جهازك بس.",
     useTpl:"استخدم القالب", toggle:"English",
     tplNames:{classic:"كلاسيك", modern:"مودرن", elegant:"أنيق", sidebar:"سايدبار"},
+    smpTitle:"سير اتعملت بسيرتي", smpSub:"أمثلة لسير ذاتية معمولة بالموقع — كل البيانات تجريبية للعرض بس.",
+    sampleBadge:"بيانات تجريبية",
     title:"سيرتي | اعمل سيرة ذاتية احترافية بالعربي والإنجليزي مجانًا"
   },
   en: {
@@ -47,6 +49,8 @@ const UI = {
     footNote:"Made with love in Egypt 🇪🇬 — your data stays on your device.",
     useTpl:"Use this template", toggle:"العربية",
     tplNames:{classic:"Classic", modern:"Modern", elegant:"Elegant", sidebar:"Sidebar"},
+    smpTitle:"CVs made with My CV", smpSub:"Real-looking examples built with the site — all data is fictional, for display only.",
+    sampleBadge:"Sample data",
     title:"My CV | Free professional Arabic & English CV builder"
   }
 };
@@ -63,6 +67,7 @@ function applyUI(){
   const tg = $("uiToggle"); if (tg) tg.textContent = UI[ui].toggle;
   document.title = UI[ui].title;
   renderGallery();
+  renderSamples();
 }
 
 /* معاينات مصغرة للقوالب */
@@ -78,8 +83,21 @@ const esc = s => String(s||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",
 const tags = s => String(s||"").split(/[,،]/).map(x=>x.trim()).filter(Boolean).map(x=>`<span>${esc(x)}</span>`).join("");
 const entries = a => a.filter(e=>e.a||e.b).map(e=>`<div class="entry"><b>${esc(e.a)}</b>${e.b?" , "+esc(e.b):""}<div class="meta">${esc(e.c)}</div><p>${esc(e.d)}</p></div>`).join("");
 
-function miniCV(tpl){
-  const S = SAMPLE, ar = ui === "ar";
+const PEOPLE = {
+  ar: [
+    {tpl:"modern", avatar:"a1", chip:"مودرن", name:"سارة أحمد", title:"مصممة جرافيك", email:"sara@example.com", phone:"+20 111 000 0000", city:"الجيزة، مصر", summary:"مصممة جرافيك بخبرة 4 سنين في الهوية البصرية وموشن جرافيك.", exp:[{a:"مصممة أولى", b:"استوديو إبداع", c:"2022 - الآن", d:"تصميم هويات بصرية لأكتر من 30 براند."}], edu:[{a:"بكالوريوس فنون جميلة", b:"جامعة حلوان", c:"2017 - 2021", d:""}], skills:"Photoshop, Illustrator, Figma", langs:"العربية, English"},
+    {tpl:"classic", avatar:"a2", chip:"كلاسيك", name:"محمود حسن", title:"محاسب", email:"mahmoud@example.com", phone:"+20 122 000 0000", city:"الإسكندرية، مصر", summary:"محاسب بخبرة 5 سنين في الحسابات العامة والضرائب.", exp:[{a:"محاسب أول", b:"شركة النيل للتجارة", c:"2021 - الآن", d:"إدارة الحسابات الشهرية وإعداد التقارير المالية."}], edu:[{a:"بكالوريوس تجارة", b:"جامعة الإسكندرية", c:"2015 - 2019", d:""}], skills:"Excel, SAP, التحليل المالي", langs:"العربية, English"},
+    {tpl:"sidebar", avatar:"a3", chip:"سايدبار", name:"منى خالد", title:"مهندسة برمجيات", email:"mona@example.com", phone:"+20 100 000 0000", city:"القاهرة، مصر", summary:"مهندسة برمجيات بخبرة 3 سنين في تطبيقات الموبايل.", exp:[{a:"مطورة Flutter", b:"تك بوينت", c:"2023 - الآن", d:"تطوير تطبيقات موبايل بأكتر من 100 ألف مستخدم."}], edu:[{a:"بكالوريوس علوم حاسب", b:"جامعة عين شمس", c:"2018 - 2022", d:""}], skills:"Flutter, Dart, Firebase", langs:"العربية, English"}
+  ],
+  en: [
+    {tpl:"modern", avatar:"a1", chip:"Modern", name:"Sara Ahmed", title:"Graphic Designer", email:"sara@example.com", phone:"+20 111 000 0000", city:"Giza, Egypt", summary:"Graphic designer with 4 years in branding and motion graphics.", exp:[{a:"Senior Designer", b:"Ibdaa Studio", c:"2022 - Present", d:"Designed brand identities for 30+ brands."}], edu:[{a:"BFA, Fine Arts", b:"Helwan University", c:"2017 - 2021", d:""}], skills:"Photoshop, Illustrator, Figma", langs:"Arabic, English"},
+    {tpl:"classic", avatar:"a2", chip:"Classic", name:"Mahmoud Hassan", title:"Accountant", email:"mahmoud@example.com", phone:"+20 122 000 0000", city:"Alexandria, Egypt", summary:"Accountant with 5 years in general ledger and tax.", exp:[{a:"Senior Accountant", b:"Nile Trading Co.", c:"2021 - Present", d:"Own monthly books and financial reporting."}], edu:[{a:"B.Com, Accounting", b:"Alexandria University", c:"2015 - 2019", d:""}], skills:"Excel, SAP, Financial analysis", langs:"Arabic, English"},
+    {tpl:"sidebar", avatar:"a3", chip:"Sidebar", name:"Mona Khaled", title:"Software Engineer", email:"mona@example.com", phone:"+20 100 000 0000", city:"Cairo, Egypt", summary:"Software engineer with 3 years in mobile apps.", exp:[{a:"Flutter Developer", b:"TechPoint", c:"2023 - Present", d:"Shipped apps with 100k+ users."}], edu:[{a:"B.Sc. Computer Science", b:"Ain Shams University", c:"2018 - 2022", d:""}], skills:"Flutter, Dart, Firebase", langs:"Arabic, English"}
+  ]
+};
+
+function miniCV(tpl, person){
+  const S = person || SAMPLE, ar = ui === "ar";
   const L = ar ? {exp:"الخبرات", edu:"التعليم", skills:"المهارات", langs:"اللغات", sum:"نبذة"} : {exp:"Experience", edu:"Education", skills:"Skills", langs:"Languages", sum:"Summary"};
   const contact = [S.email, S.phone, S.city].map(x=>`<span>${esc(x)}</span>`).join("");
   const head = `<h1>${esc(S.name)}</h1><div class="ttl">${esc(S.title)}</div><div class="contact">${contact}</div>`;
@@ -89,6 +107,21 @@ function miniCV(tpl){
   else if (tpl === "sidebar") inner = `<div class="side"><h1>${esc(S.name)}</h1><div class="ttl">${esc(S.title)}</div><div class="contact">${contact}</div><h3>${L.skills}</h3><div class="tags">${tags(S.skills)}</div><h3>${L.langs}</h3><div class="tags">${tags(S.langs)}</div></div><div class="main"><h3>${L.sum}</h3><p>${esc(S.summary)}</p><h3>${L.exp}</h3>${entries(S.exp)}<h3>${L.edu}</h3>${entries(S.edu)}</div>`;
   else inner = head + secs;
   return `<div class="cv ${tpl}" dir="${ar?"rtl":"ltr"}">${inner}</div>`;
+}
+
+function renderSamples(){
+  const grid = $("samplesGrid"); if (!grid) return;
+  grid.innerHTML = "";
+  PEOPLE[ui].forEach(p => {
+    const ini = p.name.trim().split(/\s+/).map(x => x[0]).slice(0, 2).join("").toUpperCase();
+    const card = document.createElement("div");
+    card.className = "sample-card reveal in";
+    card.innerHTML = `<div class="tpl-thumb">${miniCV(p.tpl, p)}</div>
+      <div class="sample-person"><span class="avatar ${p.avatar}">${esc(ini)}</span>
+      <span><b>${esc(p.name)}</b><small>${esc(p.title)}</small></span>
+      <span class="chip">${UI[ui].sampleBadge}</span></div>`;
+    grid.appendChild(card);
+  });
 }
 
 function renderGallery(){

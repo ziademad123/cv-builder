@@ -46,6 +46,10 @@
         <label><span data-t="phone">الموبايل</span><input id="phone" dir="ltr"></label>
         <label class="full"><span data-t="city">المدينة</span><input id="city"></label>
       </div>
+      <div class="photo-row">
+        <label class="full" style="flex:1"><span data-t="photo">الصورة الشخصية (اختياري — بتفضل على جهازك بس)</span><input id="photo" type="file" accept="image/*"></label>
+        <button class="rm" id="rmPhoto" style="display:none" data-t="rmPhoto">حذف الصورة</button>
+      </div>
       <label><span data-t="summary">نبذة عنك</span><textarea id="summary" rows="3"></textarea></label>
       <h2 data-t="exp">الخبرات</h2><div id="expList"></div>
       <button class="add-btn" id="addExp" data-t="addExp">+ أضف خبرة</button>
@@ -67,7 +71,7 @@
     </section>
     <section class="preview-wrap">
       <div class="preview-bar"><span data-t="previewNote">معاينة مباشرة — هتطبع بالشكل ده بالظبط</span></div>
-      <div id="cv" class="cv classic"></div>
+      <div class="preview-stage" id="stage"><div id="cv" class="cv classic"></div></div>
     </section>
   </div>
 </main>
