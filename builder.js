@@ -10,7 +10,8 @@ const UI = {
     name:"الاسم الكامل", title:"المسمى الوظيفي", email:"البريد الإلكتروني", phone:"الموبايل", city:"المدينة",
     summary:"نبذة عنك", exp:"الخبرات", addExp:"+ أضف خبرة", edu:"التعليم", addEdu:"+ أضف مؤهل",
     skillsT:"المهارات واللغات", skills:"المهارات (افصل بينها بفاصلة)", langs:"اللغات (افصل بينها بفاصلة)",
-    proTitle:"تحميل بدون علامة مائية", unlock:"فعّل", buy:"اطلب كود", reset:"مسح البيانات", backHome:"رجوع للرئيسية",
+    proTitle:"تحميل بدون علامة مائية", unlock:"فعّل", buy:"اطلب كود", reset:"ابدأ من جديد", backHome:"رجوع للرئيسية",
+    sure:"هتمسح كل البيانات والصورة اللي كتبتها وتبدأ من الصفر. متأكد؟",
     photo:"الصورة الشخصية (اختياري — بتفضل على جهازك بس)", rmPhoto:"حذف الصورة",
     role:"الوظيفة", company:"الشركة", period:"الفترة", desc:"الوصف", degree:"المؤهل", school:"الجامعة / المدرسة",
     remove:"حذف", ok:"تم التفعيل ✔", bad:"الكود غير صحيح",
@@ -26,7 +27,8 @@ const UI = {
     name:"Full name", title:"Job title", email:"Email", phone:"Phone", city:"City",
     summary:"Summary", exp:"Experience", addExp:"+ Add experience", edu:"Education", addEdu:"+ Add education",
     skillsT:"Skills & languages", skills:"Skills (comma separated)", langs:"Languages (comma separated)",
-    proTitle:"Download without watermark", unlock:"Unlock", buy:"Get a code", reset:"Clear data", backHome:"Back to home",
+    proTitle:"Download without watermark", unlock:"Unlock", buy:"Get a code", reset:"Start over", backHome:"Back to home",
+    sure:"This clears everything you entered, including your photo, and starts fresh. Sure?",
     photo:"Your photo (optional — stays on your device)", rmPhoto:"Remove photo",
     role:"Role", company:"Company", period:"Period", desc:"Description", degree:"Degree", school:"School / University",
     remove:"Remove", ok:"Unlocked ✔", bad:"Invalid code",
@@ -189,9 +191,12 @@ $("unlock").onclick = () => {
 };
 $("uiToggle").onclick = () => { ui = ui === "ar" ? "en" : "ar"; localStorage.setItem("ui", ui); applyUI(); };
 $("reset").onclick = () => {
+  if (!confirm(UI[ui].sure)) return;
   localStorage.removeItem("cv");
   S = JSON.parse(JSON.stringify(BLANK));
+  $("photo").value = "";
   renderPills(); renderForm(); render();
+  window.scrollTo({top: 0, behavior: "smooth"});
 };
 
 applyUI();
